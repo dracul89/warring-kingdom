@@ -1,0 +1,62 @@
+buildscript {
+    repositories {
+        jcenter()
+
+        maven { url 'http://repo1.maven.org/maven2/' }
+    }
+
+    dependencies {
+        classpath "org.lwjgl.lwjgl:lwjgl:2.9.3"
+        classpath "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-windows"
+        classpath "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-linux"
+        classpath "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-osx"
+        classpath 'org.slick2d:slick2d-core:1.0.0'
+        classpath 'org.lwjgl.lwjgl:lwjgl_util:2.9.3'
+    }
+}
+repositories {
+    jcenter()
+    maven {url "http://repo1.maven.org/maven2/"}
+}
+
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: 'java'
+
+compileJava {
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+}
+
+sourceSets.main.java.srcDirs = ['src']
+
+mainClassName = "javaGame.Game"
+
+dependencies {
+    compile "org.lwjgl.lwjgl:lwjgl:2.9.3"
+    compile "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-windows"
+    compile "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-linux"
+    compile "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-osx"
+    compile 'org.slick2d:slick2d-core:1.0.0'
+    compile 'org.lwjgl.lwjgl:lwjgl_util:2.9.3'
+// compile files('libs/slick.jar')
+}
+
+run {
+    def os = java.lang.System.getProperty("os.name").toLowerCase()
+    if(os.contains("windows")){
+        jvmArgs = ['-Djava.library.path=./lib/natives/windows/']
+    }else if(os.contains("mac os")){
+        jvmArgs = ['-Djava.library.path=./lib/natives/macosx/']
+    }else{
+        jvmArgs = ['-Djava.library.path=./lib/natives/linux/']
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion '2.10'
+}
+
+task copyNatives(type: Copy){
+    //TODO:
+}
