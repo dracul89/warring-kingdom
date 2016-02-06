@@ -1,2 +1,11 @@
 # warring-kingdom
 Warring Kingdom
+
+Building and Bunning
+```
+from a command or terminal navigate to the project root folder and type in.
+ Linux and MAC OS X
+  ./gradlew build run
+ Windows
+  gradlew build run
+```
