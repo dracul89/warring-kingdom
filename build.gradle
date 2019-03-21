@@ -30,7 +30,7 @@ compileJava {
 
 sourceSets.main.java.srcDirs = ['src']
 
-mainClassName = "javaGame.Game"
+mainClassName = "game.Game"
 
 dependencies {
     compile "org.lwjgl.lwjgl:lwjgl:2.9.3"
