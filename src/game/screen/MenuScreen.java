@@ -44,7 +44,7 @@ public class MenuScreen extends BasicGameState
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException 
 	{
 		
-		g.drawImage(title, gc.getWidth()*.5f-(title.getWidth()/2), gc.getHeight()*.2f-(title.getHeight()/2));
+		g.drawImage(title, gc.getWidth()*.5f-(title.getWidth()/2f), gc.getHeight()*.2f-(title.getHeight()/2f));
 		
 		button.setLocation(.3, .5);
 		button.drawButton("New Game", Color.white,g);
