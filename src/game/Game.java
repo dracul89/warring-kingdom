@@ -13,10 +13,9 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 
-public class Game extends StateBasedGame 
+public class Game extends StateBasedGame
 {
 	
-	public static final String gameName = "Warring Kingdoms";
 	public static final int menuScreen = 0;
 	public static final int helpScreen = 1;
 	public static final int characterScreen = 2;
@@ -26,10 +25,10 @@ public class Game extends StateBasedGame
 	private GameCharacterMain hero;
 
 
-	public Game(String name)
+	public Game()
 	{
 		
-		super(name);
+		super("Warring Kingdoms");
 		hero = new GameCharacterMain();
 		this.addState(new MenuScreen(menuScreen));
 		this.addState(new HelpScreen(helpScreen));
@@ -58,13 +57,14 @@ public class Game extends StateBasedGame
 		AppGameContainer appGC;
 		try
 		{
-			appGC = new AppGameContainer(new Game(gameName));
+//			System.setProperty("net.java.games.input.useDefaultPlugin", "false");
+			appGC = new AppGameContainer(new Game());
 			appGC.setDisplayMode(800, 600, false);
 			appGC.start();
 		}
 		catch(SlickException e)
 		{
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 		
 	}
