@@ -1,6 +1,8 @@
 buildscript {
     repositories {
         mavenCentral()
+
+        maven { url 'https://repo1.maven.org/maven2/' }
     }
 
     dependencies {
@@ -14,6 +16,7 @@ buildscript {
 }
 repositories {
     mavenCentral()
+    maven {url "https://repo1.maven.org/maven2/"}
 }
 
 apply plugin: 'application'
@@ -28,11 +31,7 @@ compileJava {
 
 sourceSets.main.java.srcDirs = ['src']
 
-application {
-    mainClass.set("game.Game")
-//    System.setProperty("org.lwjgl.input.Mouse.allowNegativeMouseCoords", "false");
-}
-
+mainClassName = "game.Game"
 
 dependencies {
     implementation "org.lwjgl.lwjgl:lwjgl:2.9.3"
@@ -44,6 +43,7 @@ dependencies {
 }
 
 run {
+    System.setProperty("net.java.games.input.useDefaultPlugin", "true")
     def os = System.getProperty("os.name").toLowerCase()
     if(os.contains("windows")){
         jvmArgs = ['-Djava.library.path=./lib/natives/windows/']
