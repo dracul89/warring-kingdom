@@ -1,55 +1,86 @@
-buildscript {
-    repositories {
-        mavenCentral()
-
-        maven { url 'https://repo1.maven.org/maven2/' }
-    }
-
-    dependencies {
-        classpath "org.lwjgl.lwjgl:lwjgl:2.9.3"
-        classpath "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-windows"
-        classpath "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-linux"
-        classpath "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-osx"
-        classpath 'org.slick2d:slick2d-core:1.0.2'
-        classpath 'org.lwjgl.lwjgl:lwjgl_util:2.9.3'
-    }
+plugins {
+    id 'java'
+    id 'application'
+    id 'idea'
+    id 'project-report'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
+
 repositories {
     mavenCentral()
-    maven {url "https://repo1.maven.org/maven2/"}
+    maven { url "https://repo1.maven.org/maven2/" }
 }
 
-apply plugin: 'application'
-apply plugin: 'idea'
-apply plugin: 'java'
-apply plugin: 'project-report'
-
-compileJava {
+java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
 
-sourceSets.main.java.srcDirs = ['src']
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
 
 mainClassName = "game.Game"
 
+// Define a separate configuration for holding the native JARs
+configurations {
+    natives
+}
+
 dependencies {
+    // Core dependencies
     implementation "org.lwjgl.lwjgl:lwjgl:2.9.3"
-    implementation "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-windows"
-    implementation "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-linux"
-    implementation "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-osx"
+    implementation "org.lwjgl.lwjgl:lwjgl_util:2.9.3"
     implementation 'org.slick2d:slick2d-core:1.0.2'
-    implementation 'org.lwjgl.lwjgl:lwjgl_util:2.9.3'
+    
+    // Other dependencies found in your project
+    implementation 'net.java.jinput:jinput:2.0.9' // Updated to latest
+    implementation 'net.java.jutils:jutils:1.0.0'
+    implementation 'org.jcraft:jorbis:0.0.17'
+
+    // Native binaries for all platforms
+    natives "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-windows"
+    natives "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-linux"
+    natives "org.lwjgl.lwjgl:lwjgl-platform:2.9.3:natives-osx"
+}
+
+// Task to unpack the native libraries from the JARs into a build folder
+task unpackNatives(type: Copy) {
+    from {
+        configurations.natives.collect { zipTree(it) }
+    }
+    into "$buildDir/natives"
+    
+    // LWJGL 2 natives are flat inside the jars, but just in case, include only binaries
+    include "**/*.dll", "**/*.so", "**/*.dylib", "**/*.jnilib"
 }
 
 run {
-    System.setProperty("net.java.games.input.useDefaultPlugin", "true")
-    def os = System.getProperty("os.name").toLowerCase()
-    if(os.contains("windows")){
-        jvmArgs = ['-Djava.library.path=./lib/natives/windows/']
-    }else if(os.contains("mac os")){
-        jvmArgs = ['-Djava.library.path=./lib/natives/macosx/']
-    }else{
-        jvmArgs = ['-Djava.library.path=./lib/natives/linux/']
+    // Ensure natives are unpacked before running
+    dependsOn unpackNatives
+    
+    // Point java.library.path to the unpacked folder
+    systemProperty "java.library.path", "$buildDir/natives"
+    
+    // Fix for some controller input issues on newer JVMs
+    systemProperty "net.java.games.input.useDefaultPlugin", "true"
+}
+
+// Configure the Shadow Jar task (Fat Jar)
+shadowJar {
+    // Ensure the output file has a consistent name (e.g., warring-kingdom-all.jar)
+    archiveClassifier.set('all')
+    
+    // Merge service files (essential for some libraries)
+    mergeServiceFiles()
+
+    manifest {
+        attributes(
+            'Main-Class': mainClassName
+        )
     }
 }
