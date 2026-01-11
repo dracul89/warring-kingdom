@@ -49,12 +49,12 @@ dependencies {
 }
 
 // Task to unpack the native libraries from the JARs into a build folder
-task unpackNatives(type: Copy) {
+tasks.register('unpackNatives', Copy) {
     from {
         configurations.natives.collect { zipTree(it) }
     }
-    into "$buildDir/natives"
-    
+    into "$project.buildDir/natives"
+
     // LWJGL 2 natives are flat inside the jars, but just in case, include only binaries
     include "**/*.dll", "**/*.so", "**/*.dylib", "**/*.jnilib"
 }
@@ -64,7 +64,7 @@ run {
     dependsOn unpackNatives
     
     // Point java.library.path to the unpacked folder
-    systemProperty "java.library.path", "$buildDir/natives"
+    systemProperty "java.library.path", "${project.getBuildDir()}/natives"
     
     // Fix for some controller input issues on newer JVMs
     systemProperty "net.java.games.input.useDefaultPlugin", "true"
